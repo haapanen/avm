@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AVM (Azure Variable Manager)
 
 This a simple command line tool for managing Azure variables in masses instead of clicking on UI one by one.
@@ -28,3 +29,7 @@ The following environment variables must be configured to use AVM
 
 - `AVM set build <build id> -s <source file path> -c <comment>` updates specified build using the JSON from source file path.
 - `AVM set release <build id> -s <source file path> -c <comment>` updates specified release using the JSON from source file path.
+=======
+# avm
+Azure Variable Manager is a tool for managing variables in a more sensible way
+>>>>>>> b70652b7d1182e3762aafa82537d8c2d9ac46c7b
