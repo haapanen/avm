@@ -2,6 +2,7 @@
 using AVM.Commands;
 using AVM.Options;
 using CommandLine;
+using CommandLine.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,13 +25,29 @@ namespace AVM
             Configuration.Bind(environment);
             Services.AddSingleton(environment);
 
-            Parser.Default.ParseArguments<ListBuildsOptions, GetBuildDefinitionOptions, UpdateBuildOptions>(args)
+            var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
+            var result = parser.ParseArguments<ListBuildsOptions, GetBuildDefinitionOptions, UpdateBuildOptions, GetOptions>(args);
+                result.WithNotParsed(errs =>
+                    {
+                        var helpText = HelpText.AutoBuild(result, h =>
+                        {
+                            h.AdditionalNewLineAfterOption = false;
+                            return HelpText.DefaultParsingErrorsHandler(result, h);
+                        }, e =>
+                        {
+                            return e;
+                        }, true);
+                        Console.WriteLine(helpText);
+                    })
                 .MapResult(
                     CreateCommandHandler<ListBuildsCommand, ListBuildsOptions>(),
                     CreateCommandHandler<GetBuildDefinitionCommand, GetBuildDefinitionOptions>(),
                     CreateCommandHandler<UpdateBuildCommand, UpdateBuildOptions>(),
- 
-                    errs => 1
+                    CreateCommandHandler<GetCommand, GetOptions>(),
+                    errs =>
+                    {
+                        return 1;
+                    }
                 );
         }
 

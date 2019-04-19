@@ -2,7 +2,7 @@
 
 namespace AVM.Options
 {
-    [Verb("get")]
+    [Verb("get-build-definition")]
     public class GetBuildDefinitionOptions
     {
         [Option('d', "definition", HelpText = "Definition ID on Azure DevOps", Required = true)]

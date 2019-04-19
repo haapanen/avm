@@ -28,3 +28,8 @@ The following environment variables must be configured to use AVM
 
 - `AVM set build <build id> -s <source file path> -c <comment>` updates specified build using the JSON from source file path.
 - `AVM set release <build id> -s <source file path> -c <comment>` updates specified release using the JSON from source file path.
+
+#### Get variables for build or release
+
+- `AVM get variables -b <build id>` returns variables for specified build
+- `AVM set variables -b <build id> -s <source file path> -c <comment>` updates variables for specified build
