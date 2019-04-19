@@ -15,7 +15,7 @@ steps:
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: 'pwd'
+    script: 'pwd\nls'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
