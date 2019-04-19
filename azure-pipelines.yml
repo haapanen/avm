@@ -14,4 +14,4 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '**/*.csproj --configuration Release'
+    projects: 'src/AVM/AVM/AVM.csproj --configuration Release'
