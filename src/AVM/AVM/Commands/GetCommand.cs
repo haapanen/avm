@@ -39,7 +39,7 @@ namespace AVM.Commands
 
             var responseText = await Get(urlPath);
 
-            string prettifiedJson = null;
+            string prettifiedJson;
             
             switch (_options.Type)
             {

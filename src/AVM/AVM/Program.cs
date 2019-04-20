@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AVM.Commands;
 using AVM.Options;
 using CommandLine;
@@ -15,6 +16,12 @@ namespace AVM
     {
         public static IConfigurationRoot Configuration { get; set; }
         public static ServiceCollection Services { get; set; }
+        private static readonly Dictionary<Type, Type> _optionTypesToCommandTypes = new Dictionary<Type, Type>
+        {
+            { typeof(GetOptions), typeof(GetCommand) },
+            { typeof(SetOptions), typeof(SetCommand) },
+            { typeof(ListOptions), typeof(ListCommand) },
+        };
         public static void Main(string[] args)
         {
             Services = new ServiceCollection();
@@ -33,39 +40,34 @@ namespace AVM
                 ListOptions,
                 SetOptions
             >(args);
-                result.WithNotParsed(errs =>
-                    {
-                        var helpText = HelpText.AutoBuild(result, h =>
-                        {
-                            h.AdditionalNewLineAfterOption = false;
-                            return HelpText.DefaultParsingErrorsHandler(result, h);
-                        }, e =>
-                        {
-                            return e;
-                        }, true);
-                        Console.WriteLine(helpText);
-                    })
-                .MapResult(
-                    CreateCommandHandler<GetCommand, GetOptions>(),
-                    CreateCommandHandler<ListCommand, ListOptions>(),
-                    CreateCommandHandler<SetCommand, SetOptions>(),
-                    errs =>
-                    {
-                        return 1;
-                    }
-                );
+            result.WithParsed(StartApp);
+            result.WithNotParsed(errs =>
+            {
+                var helpText = HelpText.AutoBuild(result, h =>
+                {
+                    h.AdditionalNewLineAfterOption = false;
+                    return HelpText.DefaultParsingErrorsHandler(result, h);
+                }, e => e, true);
+                Console.WriteLine(helpText);
+            });
         }
 
-        private static Func<TOptions, int> CreateCommandHandler<TCommand, TOptions>()
-            where TCommand : class, ICommand
-            where TOptions : class
+        private static void StartApp(object optionsObject)
         {
-            return options =>
+            Services.AddSingleton(optionsObject.GetType(), optionsObject);
+
+            if (!_optionTypesToCommandTypes.ContainsKey(optionsObject.GetType()))
             {
-                Services.AddSingleton<TCommand>();
-                Services.AddSingleton(options);
-                return Services.BuildServiceProvider().GetService<TCommand>().ExecuteAsync().Result;
-            };
+                Console.WriteLine("Unknown options type: {0}", optionsObject.GetType().FullName);
+
+                return;
+            }
+
+            var commandType = _optionTypesToCommandTypes[optionsObject.GetType()];
+            Services.AddSingleton(commandType);
+
+            var command = (ICommand) Services.BuildServiceProvider().GetService(commandType);
+            command.ExecuteAsync().Wait();
         }
     }
 }
