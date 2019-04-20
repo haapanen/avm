@@ -1,4 +1,5 @@
 # AVM (Azure Variable Manager)
+# Work in progress, most features are not implemented
 
 This a simple command line tool for managing Azure variables in masses instead of clicking on UI one by one.
 
