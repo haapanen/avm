@@ -2,7 +2,7 @@
 
 namespace AVM.Options
 {
-    [Verb("list")]
+    [Verb("list-builds")]
     public class ListBuildsOptions
     {
     }

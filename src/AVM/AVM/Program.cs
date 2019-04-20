@@ -6,6 +6,8 @@ using CommandLine.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace AVM
 {
@@ -26,7 +28,14 @@ namespace AVM
             Services.AddSingleton(environment);
 
             var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
-            var result = parser.ParseArguments<ListBuildsOptions, GetBuildDefinitionOptions, UpdateBuildOptions, GetOptions>(args);
+            var result = parser.ParseArguments<
+                ListBuildsOptions, 
+                GetBuildDefinitionOptions, 
+                UpdateBuildOptions, 
+                GetOptions, 
+                ListOptions,
+                SetOptions
+            >(args);
                 result.WithNotParsed(errs =>
                     {
                         var helpText = HelpText.AutoBuild(result, h =>
@@ -44,6 +53,8 @@ namespace AVM
                     CreateCommandHandler<GetBuildDefinitionCommand, GetBuildDefinitionOptions>(),
                     CreateCommandHandler<UpdateBuildCommand, UpdateBuildOptions>(),
                     CreateCommandHandler<GetCommand, GetOptions>(),
+                    CreateCommandHandler<ListCommand, ListOptions>(),
+                    CreateCommandHandler<SetCommand, SetOptions>(),
                     errs =>
                     {
                         return 1;

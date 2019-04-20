@@ -12,38 +12,38 @@ namespace AVM.Commands
     public class BaseCommand 
     {
         private readonly EnvironmentVariables _variables;
-        private readonly string _organization;
-        private readonly string _project;
+        protected readonly string Organization;
+        protected readonly string Project;
 
         public BaseCommand(EnvironmentVariables variables)
         {
             _variables = variables;
-            _organization = _variables.Organization;
-            _project = _variables.Project;
+            Organization = _variables.Organization;
+            Project = _variables.Project;
         }
 
-        public async Task<string> Get(string urlPath)
+        public async Task<string> Get(string url)
         {
             using (var client = CreateHttpClient())
             {
                 var response = await client.SendAsync(new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"https://dev.azure.com/{_organization}/{_project}/_apis/" + urlPath)
+                    RequestUri = new Uri(url)
                 });
 
                 return await response.Content.ReadAsStringAsync();
             }
         }
 
-        public async Task<string> Put(string urlPath, string jsonContent)
+        public async Task<string> Put(string url, string jsonContent)
         {
             using (var client = CreateHttpClient())
             {
                 var response = await client.SendAsync(new HttpRequestMessage
                 {
                     Method = HttpMethod.Put,
-                    RequestUri = new Uri($"https://dev.azure.com/{_organization}/{_project}/_apis/" + urlPath),
+                    RequestUri = new Uri(url),
                     Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
                 });
 

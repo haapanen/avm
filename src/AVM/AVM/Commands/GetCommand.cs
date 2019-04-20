@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using AVM.Models;
 using AVM.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace AVM.Commands
 {
@@ -25,11 +27,11 @@ namespace AVM.Commands
             {
                 case AvmObjectType.Build:
                 case AvmObjectType.BuildVariables:
-                    urlPath = $"build/definitions/{id}?api-version=5.0";
+                    urlPath = $"https://dev.azure.com/{Organization}/{Project}/_apis/build/definitions/{id}?api-version=5.0";
                     break;
                 case AvmObjectType.Release:
                 case AvmObjectType.ReleaseVariables:
-                    urlPath = $"release/definitions/{id}?api-version=5.0";
+                    urlPath = $"https://vsrm.dev.azure.com/{Organization}/{Project}/_apis/release/definitions/{id}?api-version=5.0";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -51,6 +53,17 @@ namespace AVM.Commands
                         Formatting.Indented);
                     break;
                 case AvmObjectType.ReleaseVariables:
+                    var release = JsonConvert.DeserializeObject<dynamic>(responseText);
+
+                    var output = new ReleaseVariables
+                    {
+                        Variables = JsonConvert.DeserializeObject<Dictionary<string, Variable>>(JsonConvert.SerializeObject(release.variables)),
+                        Environments = JsonConvert.DeserializeObject<List<PipelineEnvironment>>(JsonConvert.SerializeObject(release.environments))
+                    };
+
+                    prettifiedJson = JsonConvert.SerializeObject(
+                        output, Formatting.Indented
+                    );
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
