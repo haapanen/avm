@@ -29,9 +29,6 @@ namespace AVM
 
             var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
             var result = parser.ParseArguments<
-                ListBuildsOptions, 
-                GetBuildDefinitionOptions, 
-                UpdateBuildOptions, 
                 GetOptions, 
                 ListOptions,
                 SetOptions
@@ -49,9 +46,6 @@ namespace AVM
                         Console.WriteLine(helpText);
                     })
                 .MapResult(
-                    CreateCommandHandler<ListBuildsCommand, ListBuildsOptions>(),
-                    CreateCommandHandler<GetBuildDefinitionCommand, GetBuildDefinitionOptions>(),
-                    CreateCommandHandler<UpdateBuildCommand, UpdateBuildOptions>(),
                     CreateCommandHandler<GetCommand, GetOptions>(),
                     CreateCommandHandler<ListCommand, ListOptions>(),
                     CreateCommandHandler<SetCommand, SetOptions>(),

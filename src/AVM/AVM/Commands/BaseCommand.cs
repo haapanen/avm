@@ -58,7 +58,7 @@ namespace AVM.Commands
 
         private HttpClient CreateHttpClient()
         {
-            var token = File.ReadAllText(_variables.TokenPath);
+            var token = _variables.Token;
 
             return new HttpClient
             {
