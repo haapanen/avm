@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AVM.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AVM.Commands
 {
@@ -22,18 +24,26 @@ namespace AVM.Commands
             switch (_options.Type)
             {
                 case AvmObjectType.Build:
-                    urlPath = "build/definitions?api-version=5.0";
+                    urlPath = $"https://dev.azure.com/{Organization}/{Project}/_apis/build/definitions?api-version=5.0";
                     break;
                 case AvmObjectType.Release:
-                    urlPath = "release/definitions?api-version=5.0";
+                    urlPath = $"https://vsrm.dev.azure.com/{Organization}/{Project}/_apis/release/definitions?api-version=5.0";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
             var response = await Get(urlPath);
+            var responseJson = JsonConvert.DeserializeObject<JObject>(response);
+            var values = responseJson.SelectTokens("$.value.[?(@)]");
 
-            Console.WriteLine(PrettifyJson(response));
+            foreach (var value in values)
+            {
+                Console.Write(_options.Type.ToString() + ": ");
+                Console.WriteLine(value["name"]);
+                Console.WriteLine($" id: {value["id"]}");
+                Console.WriteLine($" link: {value.SelectToken("$._links.web.href").ToObject<string>()}");
+            }
 
             return 0;
         }

@@ -38,7 +38,7 @@ namespace AVM.Commands
                     return await response.Content.ReadAsStringAsync();
                 }
 
-                throw new Exception($"Storing data failed: {response.ReasonPhrase}");
+                throw new Exception($"Loading data failed: {response.ReasonPhrase}");
             }
         }
 
