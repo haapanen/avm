@@ -1,4 +1,5 @@
 # AVM (Azure Variable Manager)
+[![Build Status](https://haapanen.visualstudio.com/AVM/_apis/build/status/haapanen.avm?branchName=master)](https://haapanen.visualstudio.com/AVM/_build/latest?definitionId=5&branchName=master)
 # Work in progress, most features are not implemented
 
 This a simple command line tool for managing Azure variables in masses instead of clicking on UI one by one.
