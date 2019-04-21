@@ -35,6 +35,7 @@ namespace AVM
             Configuration.Bind(environment);
             Services.AddSingleton(environment);
             Services.AddSingleton<AzureRelease>();
+            Services.AddSingleton<AzureBuild>();
 
             var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
             var result = parser.ParseArguments<
