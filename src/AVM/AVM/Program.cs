@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AVM.Commands;
+using AVM.Json;
 using AVM.Options;
 using CommandLine;
 using CommandLine.Text;
@@ -33,6 +34,7 @@ namespace AVM
             var environment = new EnvironmentVariables();
             Configuration.Bind(environment);
             Services.AddSingleton(environment);
+            Services.AddSingleton<AzureRelease>();
 
             var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
             var result = parser.ParseArguments<

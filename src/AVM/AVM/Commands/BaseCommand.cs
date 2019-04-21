@@ -32,7 +32,13 @@ namespace AVM.Commands
                     RequestUri = new Uri(url)
                 });
 
-                return await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+                throw new Exception($"Storing data failed: {response.ReasonPhrase}");
             }
         }
 
@@ -47,7 +53,12 @@ namespace AVM.Commands
                     Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
                 });
 
-                return await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+                throw new Exception($"Storing data failed: {response.ReasonPhrase}");
             }
         }
 

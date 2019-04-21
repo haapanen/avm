@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AVM.Json;
 using AVM.Models;
 using AVM.Options;
 using Newtonsoft.Json;
@@ -14,10 +15,14 @@ namespace AVM.Commands
     public class SetCommand : BaseCommand, ICommand
     {
         private readonly SetOptions _options;
+        private readonly AzureBuild _azureBuild;
+        private readonly AzureRelease _azureRelease;
 
-        public SetCommand(EnvironmentVariables variables, SetOptions options) : base(variables)
+        public SetCommand(EnvironmentVariables variables, SetOptions options, AzureRelease azureRelease, AzureBuild azureBuild) : base(variables)
         {
             _options = options;
+            _azureRelease = azureRelease;
+            _azureBuild = azureBuild;
         }
 
         public async Task<int> ExecuteAsync()
@@ -38,7 +43,7 @@ namespace AVM.Commands
                     throw new ArgumentOutOfRangeException();
             }
 
-            var existing = JsonConvert.DeserializeObject<JObject>(await Get(url));
+            var existing = await Get(url);
 
             switch (_options.Type)
             {
@@ -47,102 +52,25 @@ namespace AVM.Commands
                 case AvmObjectType.Release:
                     break;
                 case AvmObjectType.BuildVariables:
-                    var newValues =
-                        JsonConvert.DeserializeObject<Dictionary<string, Variable>>(await File.ReadAllTextAsync(_options.SourceFilePath,
-                            Encoding.UTF8));
+                    var newVariables = await File.ReadAllTextAsync(_options.SourceFilePath,
+                        Encoding.UTF8);
 
-                    foreach (var kvp in newValues)
-                    {
-                        var existingVariable = existing["variables"][kvp.Key];
-                        if (existingVariable == null)
-                        {
-                            existingVariable = new JObject();
-                            existing["variables"][kvp.Key] = existingVariable;
-                        }
-
-                        if (kvp.Value == null)
-                        {
-                            existing["variables"][kvp.Key] = null;
-                        }
-                        else
-                        {
-                            existingVariable["value"] = kvp.Value.Value;
-                            existingVariable["allowOverride"] = kvp.Value.AllowOverride;
-                            existingVariable["isSecret"] = kvp.Value.IsSecret;
-                        }
-                    }
-
+                    existing = _azureBuild.UpdateBuild(existing, newVariables);
                     break;
                 case AvmObjectType.ReleaseVariables:
-                    var releaseVariables =
-                        JsonConvert.DeserializeObject<ReleaseVariables>(
-                            await File.ReadAllTextAsync(_options.SourceFilePath, Encoding.UTF8));
-
-                    foreach (var kvp in releaseVariables.Variables)
-                    {
-                        var existingVariable = existing["variables"][kvp.Key];
-                        if (existingVariable == null)
-                        {
-                            existingVariable = new JObject();
-                            existing["variables"][kvp.Key] = existingVariable;
-                        }
-                        if (kvp.Value == null)
-                        {
-                            existing["variables"][kvp.Key] = null;
-                        }
-                        else
-                        {
-                            existingVariable["value"] = kvp.Value.Value;
-                            existingVariable["allowOverride"] = kvp.Value.AllowOverride;
-                            existingVariable["isSecret"] = kvp.Value.IsSecret;
-                        }
-                    }
-
-                    foreach (var env in releaseVariables.Environments)
-                    {
-                        var environments = existing["environments"].AsJEnumerable();
-                        var matchingEnv = environments.FirstOrDefault(e => (int) e["id"] == env.Id);
-
-                        if (matchingEnv != null)
-                        {
-                            foreach (var kvp in env.Variables)
-                            {
-                                var existingVariable = matchingEnv["variables"][kvp.Key];
-                                if (existingVariable == null)
-                                {
-                                    existingVariable = new JObject();
-                                    matchingEnv["variables"][kvp.Key] = existingVariable;
-                                }
-                                if (kvp.Value == null)
-                                {
-                                    matchingEnv["variables"][kvp.Key] = null;
-                                }
-                                else
-                                {
-                                    existingVariable["value"] = kvp.Value.Value;
-                                    existingVariable["allowOverride"] = kvp.Value.AllowOverride;
-                                    existingVariable["isSecret"] = kvp.Value.IsSecret;
-                                }
-                                existingVariable["value"] = kvp.Value.Value;
-                                existingVariable["allowOverride"] = kvp.Value.AllowOverride;
-                                existingVariable["isSecret"] = kvp.Value.IsSecret;
-                            }
-                        }
-                    }
+                    existing = _azureRelease.UpdateRelease(existing,
+                        await File.ReadAllTextAsync(_options.SourceFilePath, Encoding.UTF8));
 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var response = await Put(url, JsonConvert.SerializeObject(existing));
+            var response = await Put(url, existing);
+
+            Console.WriteLine(response);
 
             return 0;
-        }
-
-        private Func<dynamic, bool> GetMatch(int envId)
-        {
-            return o => o.id == envId;
         }
     }
 }
