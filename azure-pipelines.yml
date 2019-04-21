@@ -11,16 +11,12 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'pwd'
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'ls'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration release'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
     projects: '**/*.csproj'
