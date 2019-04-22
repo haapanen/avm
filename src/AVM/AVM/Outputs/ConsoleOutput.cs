@@ -9,8 +9,15 @@ namespace AVM.Outputs
     {
         public void Write(string output)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(output),
-                Formatting.Indented));
+            try
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(output),
+                    Formatting.Indented));
+            }
+            catch (JsonException)
+            {
+                Console.WriteLine(output);
+            }
         }
     }
 }

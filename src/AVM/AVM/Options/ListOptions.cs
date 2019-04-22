@@ -10,5 +10,7 @@ namespace AVM.Options
     {
         [Value(2, HelpText = "Type of object to list: Build, Release")]
         public AvmObjectType Type { get; set; }
+        [Option('f', "full", HelpText = "Display the entire build JSON")]
+        public bool DisplayAsJson { get; set; }
     }
 }

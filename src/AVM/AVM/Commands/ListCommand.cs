@@ -2,50 +2,78 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using AVM.Azure;
 using AVM.Options;
+using AVM.Outputs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AVM.Commands
 {
-    public class ListCommand : BaseCommand, ICommand
+    public class ListCommand : ICommand
     {
+        private readonly EnvironmentVariables _variables;
         private readonly ListOptions _options;
+        private readonly IAzureClient _azureClient;
+        private readonly IOutput _output;
 
-        public ListCommand(EnvironmentVariables variables, ListOptions options) : base(variables)
+        public ListCommand(EnvironmentVariables variables, ListOptions options, IAzureClient azureClient, IOutput output) 
         {
+            _variables = variables;
             _options = options;
+            _azureClient = azureClient;
+            _output = output;
         }
 
         public async Task<int> ExecuteAsync()
         {
-            string urlPath;
+            var response = JsonConvert.DeserializeObject<JObject>(await _azureClient.GetAsync(GetUrlFor(_options, _variables)));
 
-            switch (_options.Type)
+            _output.Write(GetOutput(response, _options));
+
+            return 0;
+        }
+
+        private static string GetOutput(JObject response, ListOptions options)
+        {
+            if (options.DisplayAsJson)
+            {
+                return JsonConvert.SerializeObject(response);
+            }
+
+            var values = response.SelectTokens("$.value.[?(@)]");
+            
+            var stringBuilder = new StringBuilder();
+            foreach (var value in values)
+            {
+                stringBuilder.Append(options.Type.ToString() + ": ");
+                stringBuilder.AppendLine(value["name"].ToObject<string>());
+                stringBuilder.AppendLine($" id: {value["id"]}");
+                stringBuilder.AppendLine($" link: {value.SelectToken("$._links.web.href").ToObject<string>()}");
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        private static string GetUrlFor(ListOptions options, EnvironmentVariables variables)
+        {
+            string url;
+
+            switch (options.Type)
             {
                 case AvmObjectType.Build:
-                    urlPath = $"https://dev.azure.com/{Organization}/{Project}/_apis/build/definitions?api-version=5.0";
+                case AvmObjectType.BuildVariables:
+                    url = $"https://dev.azure.com/{variables.Organization}/{variables.Project}/_apis/build/definitions?api-version=5.0";
                     break;
                 case AvmObjectType.Release:
-                    urlPath = $"https://vsrm.dev.azure.com/{Organization}/{Project}/_apis/release/definitions?api-version=5.0";
+                case AvmObjectType.ReleaseVariables:
+                    url = $"https://vsrm.dev.azure.com/{variables.Organization}/{variables.Project}/_apis/release/definitions?api-version=5.0";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var response = await Get(urlPath);
-            var responseJson = JsonConvert.DeserializeObject<JObject>(response);
-            var values = responseJson.SelectTokens("$.value.[?(@)]");
-
-            foreach (var value in values)
-            {
-                Console.Write(_options.Type.ToString() + ": ");
-                Console.WriteLine(value["name"]);
-                Console.WriteLine($" id: {value["id"]}");
-                Console.WriteLine($" link: {value.SelectToken("$._links.web.href").ToObject<string>()}");
-            }
-
-            return 0;
+            return url;
         }
     }
 }

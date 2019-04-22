@@ -47,16 +47,6 @@ namespace AVM.Tests
             return release;
         }
 
-        private static JObject CreateValidReleaseEnvironment()
-        {
-            return new JObject
-            {
-                ["id"] = 1,
-                ["name"] = "Env 1",
-                ["variables"] = new JObject()
-            };
-        }
-
         private static JObject CreateValidVariable()
         {
             return new JObject
@@ -80,16 +70,6 @@ namespace AVM.Tests
             SetupDefaultGetAsync(azureClient);
 
             return azureClient;
-        }
-
-        private EnvironmentVariables CreateValidEnvironmentVariables()
-        {
-            return new EnvironmentVariables
-            {
-                Organization = "Organization",
-                Project = "Project",
-                Token = "Token"
-            };
         }
 
         private GetOptions CreateValidGetOptions()
@@ -126,7 +106,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(CreateValidBuildJson()));
-            var getCommand = new GetCommand(CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -145,7 +125,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(CreateValidReleaseJson()));
-            var getCommand = new GetCommand(CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -166,7 +146,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(Serialize(build)));
-            var getCommand = new GetCommand(CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -182,7 +162,7 @@ namespace AVM.Tests
             string variableName = "Variable";
             var release = CreateValidRelease();
             release["variables"][variableName] = CreateValidVariable();
-            var env = CreateValidReleaseEnvironment();
+            var env = TestUtilities.CreateValidReleaseEnvironment();
             env["variables"][variableName] = CreateValidVariable();
             (release["environments"] as JArray).Add(env);
             var output = CreateValidOutput();
@@ -191,7 +171,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(Serialize(release)));
-            var getCommand = new GetCommand(CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
 
             // Act
             await getCommand.ExecuteAsync();
