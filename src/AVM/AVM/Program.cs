@@ -4,6 +4,7 @@ using AVM.Azure;
 using AVM.Commands;
 using AVM.Json;
 using AVM.Options;
+using AVM.Outputs;
 using CommandLine;
 using CommandLine.Text;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,8 @@ namespace AVM
             var configuration = CreateConfigurationRoot();
             RegisterEnvironmentVariables(configuration, serviceCollection);
             RegisterAzureResponseHandlers(serviceCollection);
+            RegisterAzureClient(serviceCollection);
+            RegisterConsoleOutput(serviceCollection);
 
             HandleArgumentParseResult(ParseArguments(args, CreateArgumentParser()), serviceCollection);
         }
@@ -76,6 +79,16 @@ namespace AVM
             var environment = new EnvironmentVariables();
             configuration.Bind(environment);
             serviceCollection.AddSingleton(environment);
+        }
+
+        private static void RegisterConsoleOutput(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<IOutput, ConsoleOutput>();
+        }
+
+        private static void RegisterAzureClient(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<IAzureClient, AzureClient>();
         }
 
         private static void RegisterOptions(IServiceCollection serviceCollection, object optionsObject)

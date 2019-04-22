@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using AVM.Json;
 using AVM.Models;
 using Newtonsoft.Json;
@@ -24,7 +23,7 @@ namespace AVM.Tests
             // Arrange
             var buildTransformer = new BuildTransformer();
             string existingBuildJson = null;
-            string newVariables = "{}";
+            var newVariables = "{}";
 
             // Act
             Assert.Throws<ArgumentNullException>(() => buildTransformer.UpdateBuild(existingBuildJson, newVariables));
@@ -37,7 +36,7 @@ namespace AVM.Tests
         {
             // Arrange
             var buildTransformer = new BuildTransformer();
-            string existingBuildJson = "{}";
+            var existingBuildJson = "{}";
             string newVariables = null;
 
             // Act
