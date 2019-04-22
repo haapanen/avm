@@ -4,9 +4,9 @@ using AVM.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AVM.Json
+namespace AVM.Azure
 {
-    public class AzureRelease
+    public class ReleaseTransformer
     {
         public string UpdateRelease(string existingReleaseJson, string newReleaseVariablesJson)
         {

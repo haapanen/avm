@@ -4,11 +4,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using AVM.Azure;
 using Xunit;
 
 namespace AVM.Tests
 {
-    public class AzureReleaseTests
+    public class ReleaseTransformerTests
     {
         private JObject CreatePartiallyValidRelease()
         {
@@ -24,10 +25,10 @@ namespace AVM.Tests
             // Arrange
             string existingJson = null;
             var newValuesJson = "{}";
-            var azureRelease = new AzureRelease();
+            var releaseTransformer = new ReleaseTransformer();
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => azureRelease.UpdateRelease(existingJson, newValuesJson));
+            Assert.Throws<ArgumentNullException>(() => releaseTransformer.UpdateRelease(existingJson, newValuesJson));
 
             // Assert
         }
@@ -38,10 +39,10 @@ namespace AVM.Tests
             // Arrange
             string existingJson = "{}";
             string newValuesJson = null;
-            var azureRelease = new AzureRelease();
+            var releaseTransformer = new ReleaseTransformer();
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => azureRelease.UpdateRelease(existingJson, newValuesJson));
+            Assert.Throws<ArgumentNullException>(() => releaseTransformer.UpdateRelease(existingJson, newValuesJson));
 
             // Assert
         }
@@ -63,7 +64,7 @@ namespace AVM.Tests
             };
 
             // Act
-            var output = JsonConvert.DeserializeObject<JObject>(new AzureRelease().UpdateRelease(JsonConvert.SerializeObject(existing),
+            var output = JsonConvert.DeserializeObject<JObject>(new ReleaseTransformer().UpdateRelease(JsonConvert.SerializeObject(existing),
                 JsonConvert.SerializeObject(newRelease)));
 
             // Assert
@@ -89,7 +90,7 @@ namespace AVM.Tests
             };
 
             // Act
-            var output = JsonConvert.DeserializeObject<JObject>(new AzureRelease().UpdateRelease(JsonConvert.SerializeObject(existing),
+            var output = JsonConvert.DeserializeObject<JObject>(new ReleaseTransformer().UpdateRelease(JsonConvert.SerializeObject(existing),
                 JsonConvert.SerializeObject(newRelease)));
 
             // Assert
@@ -115,7 +116,7 @@ namespace AVM.Tests
             };
 
             // Act
-            var output = JsonConvert.DeserializeObject<JObject>(new AzureRelease().UpdateRelease(JsonConvert.SerializeObject(existing),
+            var output = JsonConvert.DeserializeObject<JObject>(new ReleaseTransformer().UpdateRelease(JsonConvert.SerializeObject(existing),
                 JsonConvert.SerializeObject(newRelease)));
 
             // Assert
@@ -141,7 +142,7 @@ namespace AVM.Tests
             };
 
             // Act
-            var output = JsonConvert.DeserializeObject<JObject>(new AzureRelease().UpdateRelease(JsonConvert.SerializeObject(existing),
+            var output = JsonConvert.DeserializeObject<JObject>(new ReleaseTransformer().UpdateRelease(JsonConvert.SerializeObject(existing),
                 JsonConvert.SerializeObject(newRelease)));
 
             // Assert
@@ -164,10 +165,10 @@ namespace AVM.Tests
                     }
                 }
             };
-            var azureRelease = new AzureRelease();
+            var releaseTransformer = new ReleaseTransformer();
 
             // Act
-            Assert.Throws<ArgumentException>(() => azureRelease.UpdateRelease(JsonConvert.SerializeObject(release),
+            Assert.Throws<ArgumentException>(() => releaseTransformer.UpdateRelease(JsonConvert.SerializeObject(release),
                 JsonConvert.SerializeObject(releaseVariables)));
 
             // Assert
@@ -206,10 +207,10 @@ namespace AVM.Tests
                     }
                 }
             };
-            var azureRelease = new AzureRelease();
+            var releaseTransformer = new ReleaseTransformer();
 
             // Act
-            var output = azureRelease.UpdateRelease(JsonConvert.SerializeObject(release),
+            var output = releaseTransformer.UpdateRelease(JsonConvert.SerializeObject(release),
                 JsonConvert.SerializeObject(releaseVariables));
 
             // Assert

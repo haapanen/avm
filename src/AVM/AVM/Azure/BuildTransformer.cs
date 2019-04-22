@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AVM.Json
 {
-    public class AzureBuild
+    public class BuildTransformer
     {
         public string UpdateBuild(string existingBuildJson, string newVariables)
         {

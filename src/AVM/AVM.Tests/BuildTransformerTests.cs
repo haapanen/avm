@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AVM.Tests
 {
-    public class AzureBuildTests
+    public class BuildTransformerTests
     {
         public JObject CreateValidPartialBuild()
         {
@@ -22,12 +22,12 @@ namespace AVM.Tests
         public void UpdateBuild_ThrowsArgumentNullException_IfExistingBuildIsNull()
         {
             // Arrange
-            var azureBuild = new AzureBuild();
+            var buildTransformer = new BuildTransformer();
             string existingBuildJson = null;
             string newVariables = "{}";
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => azureBuild.UpdateBuild(existingBuildJson, newVariables));
+            Assert.Throws<ArgumentNullException>(() => buildTransformer.UpdateBuild(existingBuildJson, newVariables));
 
             // Assert
         }
@@ -36,12 +36,12 @@ namespace AVM.Tests
         public void UpdateBuild_ThrowsArgumentNullException_IfNewVariablesIsNull()
         {
             // Arrange
-            var azureBuild = new AzureBuild();
+            var buildTransformer = new BuildTransformer();
             string existingBuildJson = "{}";
             string newVariables = null;
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => azureBuild.UpdateBuild(existingBuildJson, newVariables));
+            Assert.Throws<ArgumentNullException>(() => buildTransformer.UpdateBuild(existingBuildJson, newVariables));
 
             // Assert
         }
@@ -55,10 +55,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {Value = "Value"}}
             };
-            var azureBuild = new AzureBuild();
+            var buildTransformer = new BuildTransformer();
 
             // Act
-            var output = azureBuild.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert
@@ -74,10 +74,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {AllowOverride = true}}
             };
-            var azureBuild = new AzureBuild();
+            var buildTransformer = new BuildTransformer();
 
             // Act
-            var output = azureBuild.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert
@@ -93,10 +93,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {IsSecret = true}}
             };
-            var azureBuild = new AzureBuild();
+            var buildTransformer = new BuildTransformer();
 
             // Act
-            var output = azureBuild.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert
