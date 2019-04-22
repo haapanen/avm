@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AVM.Azure;
 using Newtonsoft.Json.Linq;
+using NSubstitute;
 
 namespace AVM.Tests
 {
@@ -25,6 +27,11 @@ namespace AVM.Tests
                 Project = "Project",
                 Token = "Token"
             };
+        }
+
+        internal static IUrlStore CreateValidUrlStore()
+        {
+            return Substitute.For<IUrlStore>();
         }
     }
 }

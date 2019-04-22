@@ -86,8 +86,6 @@ namespace AVM.Tests
             return Substitute.For<IAzureClient>();
         }
 
-
-
         [Fact]
         public async Task ExecuteAsync_ReturnsBuilds_WhenObjectTypeIsBuild()
         {
@@ -97,8 +95,8 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidBuildsListJson());
             var output = CreateValidOutput();
-            var listCommand = new ListCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient,
-                output);
+            var listCommand = new ListCommand(options, azureClient,
+                output, TestUtilities.CreateValidUrlStore());
 
             // Act
             var response = await listCommand.ExecuteAsync();
@@ -116,8 +114,8 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidReleasesListJson());
             var output = CreateValidOutput();
-            var listCommand = new ListCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient,
-                output);
+            var listCommand = new ListCommand(options, azureClient,
+                output, TestUtilities.CreateValidUrlStore());
 
             // Act
             var response = await listCommand.ExecuteAsync();
@@ -137,8 +135,8 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidReleasesListJson());
             var output = CreateValidOutput();
-            var listCommand = new ListCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient,
-                output);
+            var listCommand = new ListCommand(options, azureClient,
+                output, TestUtilities.CreateValidUrlStore());
 
             // Act
             var response = await listCommand.ExecuteAsync();

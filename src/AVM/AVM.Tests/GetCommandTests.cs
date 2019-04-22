@@ -106,7 +106,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(CreateValidBuildJson()));
-            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(options, azureClient, output, TestUtilities.CreateValidUrlStore());
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -125,7 +125,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(CreateValidReleaseJson()));
-            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(options, azureClient, output, TestUtilities.CreateValidUrlStore());
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -146,7 +146,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(Serialize(build)));
-            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(options, azureClient, output, TestUtilities.CreateValidUrlStore());
 
             // Act 
             await getCommand.ExecuteAsync();
@@ -171,7 +171,7 @@ namespace AVM.Tests
             var azureClient = CreateValidAzureClient();
             azureClient
                 .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(Serialize(release)));
-            var getCommand = new GetCommand(TestUtilities.CreateValidEnvironmentVariables(), options, azureClient, output);
+            var getCommand = new GetCommand(options, azureClient, output, TestUtilities.CreateValidUrlStore());
 
             // Act
             await getCommand.ExecuteAsync();

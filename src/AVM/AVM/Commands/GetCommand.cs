@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using AVM.Azure;
@@ -13,22 +12,22 @@ namespace AVM.Commands
 {
     public class GetCommand : ICommand
     {
-        private readonly EnvironmentVariables _variables;
         private readonly GetOptions _options;
         private readonly IAzureClient _azureClient;
         private readonly IOutput _output;
+        private readonly IUrlStore _urlStore;
 
-        public GetCommand(EnvironmentVariables variables, GetOptions options, IAzureClient azureClient, IOutput output)
+        public GetCommand(GetOptions options, IAzureClient azureClient, IOutput output, IUrlStore urlStore)
         {
-            _variables = variables;
             _options = options;
             _azureClient = azureClient;
             _output = output;
+            _urlStore = urlStore;
         }
 
         public async Task<int> ExecuteAsync()
         {
-            var responseText = await _azureClient.GetAsync(GetAzureUrl(_variables, _options));
+            var responseText = await _azureClient.GetAsync(_urlStore.GetObjectUrl(_options.Type, _options.Id));
 
             var simplifiedJson = SimplifyJson(responseText);
 
@@ -61,30 +60,6 @@ namespace AVM.Commands
             }
 
             return responseText;
-        }
-
-        private static string GetAzureUrl(EnvironmentVariables variables, GetOptions options)
-        {
-            string id = options.Id;
-            string url = null;
-
-            switch (options.Type)
-            {
-                case AvmObjectType.Build:
-                case AvmObjectType.BuildVariables:
-                    url =
-                        $"https://dev.azure.com/{variables.Organization}/{variables.Project}/_apis/build/definitions/{id}?api-version=5.0";
-                    break;
-                case AvmObjectType.Release:
-                case AvmObjectType.ReleaseVariables:
-                    url =
-                        $"https://vsrm.dev.azure.com/{variables.Organization}/{variables.Project}/_apis/release/definitions/{id}?api-version=5.0";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return url;
         }
     }
 }

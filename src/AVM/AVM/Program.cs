@@ -29,10 +29,10 @@ namespace AVM
             RegisterAzureResponseHandlers(serviceCollection);
             RegisterAzureClient(serviceCollection);
             RegisterConsoleOutput(serviceCollection);
+            RegisterUrlStore(serviceCollection);
 
             HandleArgumentParseResult(ParseArguments(args, CreateArgumentParser()), serviceCollection);
         }
-
         private static Parser CreateArgumentParser()
         {
             var parser = new Parser(settings => settings.CaseInsensitiveEnumValues = true);
@@ -84,6 +84,11 @@ namespace AVM
         private static void RegisterConsoleOutput(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IOutput, ConsoleOutput>();
+        }
+
+        private static void RegisterUrlStore(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<UrlStore>();
         }
 
         private static void RegisterAzureClient(IServiceCollection serviceCollection)
