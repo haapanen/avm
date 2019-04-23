@@ -88,7 +88,7 @@ namespace AVM
 
         private static void RegisterUrlStore(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<UrlStore>();
+            serviceCollection.AddSingleton<IUrlStore, UrlStore>();
         }
 
         private static void RegisterAzureClient(IServiceCollection serviceCollection)

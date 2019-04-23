@@ -1,51 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AVM.Azure;
 using AVM.Json;
-using AVM.Models;
 using AVM.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using AVM.Outputs;
 
 namespace AVM.Commands
 {
-    public class SetCommand : BaseCommand, ICommand
+    public class SetCommand : ICommand
     {
         private readonly SetOptions _options;
         private readonly BuildTransformer _buildTransformer;
         private readonly ReleaseTransformer _releaseTransformer;
+        private readonly IUrlStore _urlStore;
+        private readonly IAzureClient _azureClient;
+        private readonly IOutput _output;
 
-        public SetCommand(EnvironmentVariables variables, SetOptions options, ReleaseTransformer releaseTransformer, BuildTransformer buildTransformer) : base(variables)
+        public SetCommand(SetOptions options, ReleaseTransformer releaseTransformer, BuildTransformer buildTransformer, IUrlStore urlStore, IAzureClient azureClient, IOutput output) 
         {
             _options = options;
             _releaseTransformer = releaseTransformer;
             _buildTransformer = buildTransformer;
+            _urlStore = urlStore;
+            _azureClient = azureClient;
+            _output = output;
         }
 
         public async Task<int> ExecuteAsync()
         {
-            string url = null;
+            var url = _urlStore.GetObjectUrl(_options.Type, _options.Id);
 
-            switch (_options.Type)
-            {
-                case AvmObjectType.Build:
-                case AvmObjectType.BuildVariables:
-                    url = $"https://dev.azure.com/{Organization}/{Project}/_apis/build/definitions/{_options.Id}?api-version=5.0";
-                    break;
-                case AvmObjectType.Release:
-                case AvmObjectType.ReleaseVariables:
-                    url = $"https://vsrm.dev.azure.com/{Organization}/{Project}/_apis/release/definitions/{_options.Id}?api-version=5.0";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            var existing = await _azureClient.GetAsync(_urlStore.GetObjectUrl(_options.Type, _options.Id));
 
-            var existing = await Get(url);
+            var response = await _azureClient.PutAsync(url, await TransformObject(existing));
 
+            _output.Write(response);
+
+            return 0;
+        }
+
+        private async Task<string> TransformObject(string existing)
+        {
+            string newValue = existing;
             switch (_options.Type)
             {
                 case AvmObjectType.Build:
@@ -56,22 +54,17 @@ namespace AVM.Commands
                     var newVariables = await File.ReadAllTextAsync(_options.SourceFilePath,
                         Encoding.UTF8);
 
-                    existing = _buildTransformer.UpdateBuild(existing, newVariables);
+                    newValue = _buildTransformer.UpdateBuild(existing, newVariables);
                     break;
                 case AvmObjectType.ReleaseVariables:
-                    existing = _releaseTransformer.UpdateRelease(existing,
+                    newValue = _releaseTransformer.UpdateRelease(existing,
                         await File.ReadAllTextAsync(_options.SourceFilePath, Encoding.UTF8));
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            var response = await Put(url, existing);
-
-            Console.WriteLine(response);
-
-            return 0;
+            return newValue;
         }
     }
 }

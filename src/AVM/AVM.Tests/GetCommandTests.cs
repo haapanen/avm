@@ -16,45 +16,12 @@ namespace AVM.Tests
     {
         private string CreateValidBuildJson()
         {
-            return JsonConvert.SerializeObject(CreateValidBuild());
-        }
-
-        private static JObject CreateValidBuild()
-        {
-            var build = new JObject
-            {
-                ["id"] = 1,
-                ["name"] = "Build 1",
-                ["variables"] = new JObject()
-            };
-            return build;
+            return JsonConvert.SerializeObject(TestUtilities.CreateValidBuild());
         }
 
         private string CreateValidReleaseJson()
         {
-            return JsonConvert.SerializeObject(CreateValidRelease());
-        }
-
-        private static JObject CreateValidRelease()
-        {
-            var release = new JObject
-            {
-                ["id"] = 1,
-                ["name"] = "Release 1",
-                ["variables"] = new JObject(),
-                ["environments"] = new JArray()
-            };
-            return release;
-        }
-
-        private static JObject CreateValidVariable()
-        {
-            return new JObject
-            {
-                ["value"] = "value",
-                ["isSecret"] = false,
-                ["allowOverride"] = false
-            };
+            return JsonConvert.SerializeObject(TestUtilities.CreateValidRelease());
         }
 
         private void SetupDefaultGetAsync(IAzureClient azureClient)
@@ -138,8 +105,8 @@ namespace AVM.Tests
         public async Task ExecuteAsync_OutputsBuildVariables_WhenGettingBuildVariables()
         {
             // Arrange
-            var build = CreateValidBuild();
-            build["variables"]["Variable"] = CreateValidVariable();
+            var build = TestUtilities.CreateValidBuild();
+            build["variables"]["Variable"] = TestUtilities.CreateValidVariableJObject();
             var output = CreateValidOutput();
             var options = CreateValidGetOptions();
             options.Type = AvmObjectType.BuildVariables;
@@ -160,10 +127,10 @@ namespace AVM.Tests
         {
             // Arrange
             string variableName = "Variable";
-            var release = CreateValidRelease();
-            release["variables"][variableName] = CreateValidVariable();
+            var release = TestUtilities.CreateValidRelease();
+            release["variables"][variableName] = TestUtilities.CreateValidVariableJObject();
             var env = TestUtilities.CreateValidReleaseEnvironment();
-            env["variables"][variableName] = CreateValidVariable();
+            env["variables"][variableName] = TestUtilities.CreateValidVariableJObject();
             (release["environments"] as JArray).Add(env);
             var output = CreateValidOutput();
             var options = CreateValidGetOptions();
