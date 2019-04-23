@@ -26,8 +26,15 @@ namespace AVM.Extensions
             {
                 variableContainer[variable.Key] = new JObject();
                 variableContainer[variable.Key]["value"] = variable.Value.Value;
-                variableContainer[variable.Key]["allowOverride"] = variable.Value.AllowOverride;
-                variableContainer[variable.Key]["isSecret"] = variable.Value.IsSecret;
+                if (variable.Value.AllowOverride.HasValue)
+                {
+                    variableContainer[variable.Key]["allowOverride"] = variable.Value.AllowOverride;
+                }
+
+                if (variable.Value.IsSecret.HasValue)
+                {
+                    variableContainer[variable.Key]["isSecret"] = variable.Value.IsSecret;
+                }
             }
         }
     }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using AVM.Azure;
 using AVM.Commands;
-using AVM.Json;
 using AVM.Options;
 using AVM.Outputs;
 using CommandLine;
@@ -71,7 +70,7 @@ namespace AVM
         private static void RegisterAzureResponseHandlers(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<ReleaseTransformer>();
-            serviceCollection.AddSingleton<BuildTransformer>();
+            serviceCollection.AddSingleton<VariableContainerTransformer>();
         }
 
         private static void RegisterEnvironmentVariables(IConfiguration configuration, IServiceCollection serviceCollection)

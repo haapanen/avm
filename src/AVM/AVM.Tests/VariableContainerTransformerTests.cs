@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AVM.Json;
+using AVM.Azure;
 using AVM.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AVM.Tests
 {
-    public class BuildTransformerTests
+    public class VariableContainerTransformerTests
     {
         public JObject CreateValidPartialBuild()
         {
@@ -18,35 +18,35 @@ namespace AVM.Tests
         }
 
         [Fact]
-        public void UpdateBuild_ThrowsArgumentNullException_IfExistingBuildIsNull()
+        public void UpdateContainer_ThrowsArgumentNullException_IfExistingBuildIsNull()
         {
             // Arrange
-            var buildTransformer = new BuildTransformer();
-            string existingBuildJson = null;
+            var transformer = new VariableContainerTransformer();
+            string existingContainerJson = null;
             var newVariables = "{}";
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => buildTransformer.UpdateBuild(existingBuildJson, newVariables));
+            Assert.Throws<ArgumentNullException>(() => transformer.UpdateContainer(existingContainerJson, newVariables));
 
             // Assert
         }
 
         [Fact]
-        public void UpdateBuild_ThrowsArgumentNullException_IfNewVariablesIsNull()
+        public void UpdateContainer_ThrowsArgumentNullException_IfNewVariablesIsNull()
         {
             // Arrange
-            var buildTransformer = new BuildTransformer();
-            var existingBuildJson = "{}";
+            var transformer = new VariableContainerTransformer();
+            var existingContainerJson = "{}";
             string newVariables = null;
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => buildTransformer.UpdateBuild(existingBuildJson, newVariables));
+            Assert.Throws<ArgumentNullException>(() => transformer.UpdateContainer(existingContainerJson, newVariables));
 
             // Assert
         }
 
         [Fact]
-        public void UpdateBuild_UpdatesVariableValue()
+        public void UpdateContainer_UpdatesVariableValue()
         {
             // Arrange
             var build = CreateValidPartialBuild();
@@ -54,10 +54,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {Value = "Value"}}
             };
-            var buildTransformer = new BuildTransformer();
+            var transformer = new VariableContainerTransformer();
 
             // Act
-            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = transformer.UpdateContainer(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert
@@ -65,7 +65,7 @@ namespace AVM.Tests
         }
 
         [Fact]
-        public void UpdateBuild_UpdatesVariableIsSecret()
+        public void UpdateContainer_UpdatesVariableIsSecret()
         {
             // Arrange
             var build = CreateValidPartialBuild();
@@ -73,10 +73,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {AllowOverride = true}}
             };
-            var buildTransformer = new BuildTransformer();
+            var transformer = new VariableContainerTransformer();
 
             // Act
-            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = transformer.UpdateContainer(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert
@@ -84,7 +84,7 @@ namespace AVM.Tests
         }
 
         [Fact]
-        public void UpdateBuild_UpdatesVariableAllowOverride()
+        public void UpdateContainer_UpdatesVariableAllowOverride()
         {
             // Arrange
             var build = CreateValidPartialBuild();
@@ -92,10 +92,10 @@ namespace AVM.Tests
             {
                 {"Variable1", new Variable {IsSecret = true}}
             };
-            var buildTransformer = new BuildTransformer();
+            var transformer = new VariableContainerTransformer();
 
             // Act
-            var output = buildTransformer.UpdateBuild(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
+            var output = transformer.UpdateContainer(JsonConvert.SerializeObject(build), JsonConvert.SerializeObject(variables));
             var outputJObject = JsonConvert.DeserializeObject<JObject>(output);
 
             // Assert

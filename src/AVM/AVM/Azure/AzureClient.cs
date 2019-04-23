@@ -53,7 +53,7 @@ namespace AVM.Azure
                     return await GetResponseAsync(response);
                 }
 
-                throw new Exception($"Storing data failed: {response.ReasonPhrase}");
+                throw new Exception($"Storing data failed: {response.ReasonPhrase}\n{await response.Content.ReadAsStringAsync()}");
             }
         }
 

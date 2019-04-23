@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using AVM.Azure;
-using AVM.Json;
 using AVM.Options;
 using AVM.Outputs;
 
@@ -12,17 +11,17 @@ namespace AVM.Commands
     public class SetCommand : ICommand
     {
         private readonly SetOptions _options;
-        private readonly BuildTransformer _buildTransformer;
+        private readonly VariableContainerTransformer _variableContainerTransformer;
         private readonly ReleaseTransformer _releaseTransformer;
         private readonly IUrlStore _urlStore;
         private readonly IAzureClient _azureClient;
         private readonly IOutput _output;
 
-        public SetCommand(SetOptions options, ReleaseTransformer releaseTransformer, BuildTransformer buildTransformer, IUrlStore urlStore, IAzureClient azureClient, IOutput output) 
+        public SetCommand(SetOptions options, ReleaseTransformer releaseTransformer, VariableContainerTransformer variableContainerTransformer, IUrlStore urlStore, IAzureClient azureClient, IOutput output) 
         {
             _options = options;
             _releaseTransformer = releaseTransformer;
-            _buildTransformer = buildTransformer;
+            _variableContainerTransformer = variableContainerTransformer;
             _urlStore = urlStore;
             _azureClient = azureClient;
             _output = output;
@@ -51,10 +50,11 @@ namespace AVM.Commands
                 case AvmObjectType.Release:
                     break;
                 case AvmObjectType.BuildVariables:
+                case AvmObjectType.VariableGroupVariables:
                     var newVariables = await File.ReadAllTextAsync(_options.SourceFilePath,
                         Encoding.UTF8);
 
-                    newValue = _buildTransformer.UpdateBuild(existing, newVariables);
+                    newValue = _variableContainerTransformer.UpdateContainer(existing, newVariables);
                     break;
                 case AvmObjectType.ReleaseVariables:
                     newValue = _releaseTransformer.UpdateRelease(existing,

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AVM.Azure;
 using AVM.Commands;
-using AVM.Json;
 using AVM.Models;
 using AVM.Options;
 using AVM.Outputs;
@@ -60,7 +59,7 @@ namespace AVM.Tests
             var options = CreateValidSetOptions(AvmObjectType.BuildVariables);
             File.WriteAllText(options.SourceFilePath, JsonConvert.SerializeObject(variables));
             var setCommand = new SetCommand(options, new ReleaseTransformer(),
-                new BuildTransformer(), CreateValidUrlStore(), azureClient, output);
+                new VariableContainerTransformer(), CreateValidUrlStore(), azureClient, output);
 
             // Act
             await setCommand.ExecuteAsync();
@@ -110,7 +109,7 @@ namespace AVM.Tests
             azureClient.GetAsync(Arg.Any<string>()).Returns(JsonConvert.SerializeObject(release));
             var output = CreateValidOutput();
             var urlStore = CreateValidUrlStore();
-            var setCommand = new SetCommand(options, new ReleaseTransformer(), new BuildTransformer(), urlStore, azureClient, output);
+            var setCommand = new SetCommand(options, new ReleaseTransformer(), new VariableContainerTransformer(), urlStore, azureClient, output);
 
             // Act
             await setCommand.ExecuteAsync();
@@ -119,6 +118,33 @@ namespace AVM.Tests
             // Assert
             await azureClient.Received().PutAsync(Arg.Any<string>(),
                 Arg.Is<string>(res => JToken.DeepEquals(JsonConvert.DeserializeObject<JToken>(res), expectedRelease)));
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_UploadsCorrectlyModifiedVariableGroup()
+        {
+            // Arrange
+            var variableGroup = TestUtilities.CreateValidVariableGroupJToken();
+            var expectedVariableGroup = TestUtilities.CreateValidVariableGroupJToken();
+            expectedVariableGroup["variables"]["Variable"] = TestUtilities.CreateValidVariableJObject();
+            var variables = new Dictionary<string, Variable>
+            {
+                { "Variable", TestUtilities.CreateValidVariable() }
+            };
+            var azureClient = CreateValidAzureClient();
+            azureClient.GetAsync(Arg.Any<string>()).Returns(JsonConvert.SerializeObject(variableGroup));
+            var output = CreateValidOutput();
+            var options = CreateValidSetOptions(AvmObjectType.VariableGroupVariables);
+            File.WriteAllText(options.SourceFilePath, JsonConvert.SerializeObject(variables));
+            var setCommand = new SetCommand(options, new ReleaseTransformer(),
+                new VariableContainerTransformer(), CreateValidUrlStore(), azureClient, output);
+
+            // Act
+            await setCommand.ExecuteAsync();
+            File.Delete(options.SourceFilePath);
+
+            // Assert
+            await azureClient.Received().PutAsync(Arg.Any<string>(), Arg.Is<string>(res => JToken.DeepEquals(JsonConvert.DeserializeObject<JToken>(res), expectedVariableGroup)));
         }
 
         [Fact]
@@ -133,7 +159,7 @@ namespace AVM.Tests
             var output = CreateValidOutput();
 
             var setCommand = new SetCommand(options, new ReleaseTransformer(),
-                new BuildTransformer(), CreateValidUrlStore(), azureClient, output);
+                new VariableContainerTransformer(), CreateValidUrlStore(), azureClient, output);
 
             // Act
             await setCommand.ExecuteAsync();
@@ -156,7 +182,7 @@ namespace AVM.Tests
             var output = CreateValidOutput();
 
             var setCommand = new SetCommand(options, new ReleaseTransformer(),
-                new BuildTransformer(), CreateValidUrlStore(), azureClient, output);
+                new VariableContainerTransformer(), CreateValidUrlStore(), azureClient, output);
 
             // Act
             await setCommand.ExecuteAsync();
