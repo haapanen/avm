@@ -77,5 +77,24 @@ namespace AVM.Tests
                 AllowOverride = false
             };
         }
+
+        internal static JToken CreateValidVariableGroupJToken()
+        {
+            return new JObject
+            {
+                ["variables"] = new JObject(),
+                ["id"] = 1,
+                ["name"] = "Variable group"
+            };
+        }
+
+        internal static JToken CreateValidVariableGroupListJToken()
+        {
+            return new JObject
+            {
+                ["count"] = 0,
+                ["value"] = new JArray()
+            };
+        }
     }
 }

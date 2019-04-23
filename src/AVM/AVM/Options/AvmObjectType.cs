@@ -5,6 +5,7 @@
         Invalid,
         Build,
         Release,
+        VariableGroup,
         BuildVariables,
         ReleaseVariables
     }

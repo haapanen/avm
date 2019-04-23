@@ -12,11 +12,11 @@ namespace AVM.Tests
 {
     public class ListCommandTests
     {
-        private ListOptions CreateValidListOptions()
+        private ListOptions CreateValidListOptions(AvmObjectType type)
         {
             return new ListOptions
             {
-                Type = AvmObjectType.Build
+                Type = type
             };
         }
 
@@ -86,12 +86,18 @@ namespace AVM.Tests
             return Substitute.For<IAzureClient>();
         }
 
+        private string CreateValidVariableGroupsList()
+        {
+            var variableGroupList = TestUtilities.CreateValidVariableGroupListJToken();
+            ((JArray)variableGroupList["value"]).Add(TestUtilities.CreateValidVariableGroupJToken());
+            return JsonConvert.SerializeObject(variableGroupList);
+        }
+
         [Fact]
         public async Task ExecuteAsync_ReturnsBuilds_WhenObjectTypeIsBuild()
         {
             // Arrange
-            var options = CreateValidListOptions();
-            options.Type = AvmObjectType.Build;
+            var options = CreateValidListOptions(AvmObjectType.Build);
             var azureClient = CreateValidAzureClient();
             azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidBuildsListJson());
             var output = CreateValidOutput();
@@ -109,8 +115,7 @@ namespace AVM.Tests
         public async Task ExecuteAsync_ReturnsReleases_WhenObjectTypeIsRelease()
         {
             // Arrange
-            var options = CreateValidListOptions();
-            options.Type = AvmObjectType.Release;
+            var options = CreateValidListOptions(AvmObjectType.Release);
             var azureClient = CreateValidAzureClient();
             azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidReleasesListJson());
             var output = CreateValidOutput();
@@ -125,11 +130,29 @@ namespace AVM.Tests
         }
 
         [Fact]
+        public async Task ExecuteAsync_ReturnsVariableGroups_WhenObjectTypeIsVariableGroup()
+        {
+            // Arrange
+            var options = CreateValidListOptions(AvmObjectType.VariableGroup);
+            var azureClient = CreateValidAzureClient();
+            azureClient.GetAsync(Arg.Any<string>()).Returns(CreateValidVariableGroupsList());
+            var output = CreateValidOutput();
+            var listCommand = new ListCommand(options, azureClient,
+                output, TestUtilities.CreateValidUrlStore());
+
+            // Act
+            await listCommand.ExecuteAsync();
+
+            // Assert
+            output.Received().Write(Arg.Is<string>(res => res.Contains("VariableGroup: Variable group")));
+        }
+
+        [Fact]
         public async Task ExecuteAsync_ReturnsReleaseJson_WhenDisplayAsJsonIsOn()
         {
             
             // Arrange
-            var options = CreateValidListOptions();
+            var options = CreateValidListOptions(AvmObjectType.Release);
             options.Type = AvmObjectType.Release;
             options.DisplayAsJson = true;
             var azureClient = CreateValidAzureClient();

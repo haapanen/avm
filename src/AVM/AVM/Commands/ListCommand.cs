@@ -49,7 +49,7 @@ namespace AVM.Commands
                 stringBuilder.Append(options.Type + ": ");
                 stringBuilder.AppendLine(value["name"].ToObject<string>());
                 stringBuilder.AppendLine($" id: {value["id"]}");
-                stringBuilder.AppendLine($" link: {value.SelectToken("$._links.web.href").ToObject<string>()}");
+                stringBuilder.AppendLine($" link: {value.SelectToken("$._links.web.href")?.ToObject<string>() ?? "no link available"}");
             }
 
             return stringBuilder.ToString();
