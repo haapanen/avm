@@ -7,6 +7,7 @@
         Release,
         VariableGroup,
         BuildVariables,
-        ReleaseVariables
+        ReleaseVariables,
+        VariableGroupVariables,
     }
 }

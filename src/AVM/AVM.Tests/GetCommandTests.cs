@@ -123,6 +123,28 @@ namespace AVM.Tests
         }
 
         [Fact]
+        public async Task ExecuteAsync_OutputsVariableGroupVariables_WhenGettingVariableGroupVariables()
+        {
+            // Arrange
+            var variableGroup = TestUtilities.CreateValidVariableGroupJToken();
+            variableGroup["variables"]["Variable"] = TestUtilities.CreateValidVariableJObject();
+            var output = CreateValidOutput();
+            var options = CreateValidGetOptions();
+            options.Type = AvmObjectType.VariableGroupVariables;
+            var azureClient = CreateValidAzureClient();
+            azureClient
+                .GetAsync(Arg.Any<string>()).Returns(Task.FromResult(Serialize(variableGroup)));
+            var getCommand = new GetCommand(options, azureClient, output, TestUtilities.CreateValidUrlStore());
+
+            // Act 
+            await getCommand.ExecuteAsync();
+
+            // Assert
+            output.Received().Write(Arg.Is(Serialize(variableGroup["variables"])));
+        }
+
+
+        [Fact]
         public async Task ExecuteAsync_OutputsReleaseVariables_WhenGettingReleaseVariables()
         {
             // Arrange

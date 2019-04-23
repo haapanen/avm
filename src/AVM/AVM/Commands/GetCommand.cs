@@ -41,6 +41,7 @@ namespace AVM.Commands
             switch (_options.Type)
             {
                 case AvmObjectType.BuildVariables:
+                case AvmObjectType.VariableGroupVariables:
                     return JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(responseText).variables);
                 case AvmObjectType.ReleaseVariables:
                     var release = JsonConvert.DeserializeObject<dynamic>(responseText);

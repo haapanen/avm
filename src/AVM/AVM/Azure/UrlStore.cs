@@ -29,6 +29,7 @@ namespace AVM.Azure
                     url = $"https://vsrm.dev.azure.com/{_variables.Organization}/{_variables.Project}/_apis/release/definitions/{id}?api-version=5.0";
                     break;
                 case AvmObjectType.VariableGroup:
+                case AvmObjectType.VariableGroupVariables:
                     url = $"https://dev.azure.com/{_variables.Organization}/{_variables.Project}/_apis/distributedtask/variablegroups/{id}?api-version=5.0-preview.1";
                     break;
                 default:
@@ -53,6 +54,7 @@ namespace AVM.Azure
                     url = $"https://vsrm.dev.azure.com/{_variables.Organization}/{_variables.Project}/_apis/release/definitions?api-version=5.0";
                     break;
                 case AvmObjectType.VariableGroup:
+                case AvmObjectType.VariableGroupVariables:
                     url = $"https://dev.azure.com/{_variables.Organization}/{_variables.Project}/_apis/distributedtask/variablegroups?api-version=5.0-preview.1";
                     break;
                 default:
